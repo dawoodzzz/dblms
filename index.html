@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LMS — Learning Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #13161e;
+  --surface2: #1a1e28;
+  --surface3: #222736;
+  --border: #2a2f3e;
+  --border2: #363d52;
+  --accent: #6c8fff;
+  --accent2: #a78bfa;
+  --accent3: #34d399;
+  --accent4: #fb923c;
+  --accent5: #f472b6;
+  --text: #e8eaf0;
+  --text2: #9aa3b8;
+  --text3: #5a6278;
+  --danger: #f87171;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --radius: 10px;
+  --radius-lg: 16px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.logo h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+.logo p { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: 'DM Mono', monospace; }
+.db-status {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 20px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px; font-family: 'DM Mono', monospace;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); }
+.dot.online { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.nav-section { padding: 16px 12px 8px; }
+.nav-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text3);
+  padding: 0 8px; margin-bottom: 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: var(--radius);
+  cursor: pointer; color: var(--text2); font-size: 13px;
+  transition: all 0.15s; font-weight: 400;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: rgba(108,143,255,0.12); color: var(--accent); font-weight: 500; }
+.nav-item .icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+.nav-item .badge {
+  margin-left: auto; font-size: 10px; font-family: 'DM Mono', monospace;
+  background: var(--surface3); color: var(--text3);
+  padding: 1px 6px; border-radius: 99px;
+}
+.nav-item.active .badge { background: rgba(108,143,255,0.2); color: var(--accent); }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar {
+  padding: 16px 28px; border-bottom: 1px solid var(--border);
+  background: var(--surface); display: flex; align-items: center; gap: 16px;
+  flex-shrink: 0;
+}
+.topbar h2 { font-family: 'DM Serif Display', serif; font-size: 20px; font-weight: 400; }
+.topbar .domain-badge {
+  font-size: 11px; font-family: 'DM Mono', monospace;
+  padding: 3px 10px; border-radius: 99px; font-weight: 500;
+}
+.topbar-actions { margin-left: auto; display: flex; gap: 8px; }
+.btn {
+  padding: 7px 16px; border-radius: var(--radius); border: 1px solid var(--border2);
+  background: var(--surface2); color: var(--text); font-size: 13px;
+  cursor: pointer; font-family: 'Outfit', sans-serif; font-weight: 500;
+  transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+}
+.btn:hover { background: var(--surface3); border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { background: #7b9fff; border-color: #7b9fff; color: #fff; }
+.btn.danger { background: transparent; border-color: var(--danger); color: var(--danger); }
+.btn.danger:hover { background: rgba(248,113,113,0.1); }
+.content { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+/* DASHBOARD */
+.dashboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px;
+}
+.stat-card .label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+.stat-card .value { font-family: 'DM Serif Display', serif; font-size: 36px; margin: 6px 0 2px; line-height: 1; }
+.stat-card .sub { font-size: 12px; color: var(--text3); }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px;
+}
+.card h3 { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.06em; }
+.recent-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.recent-item:last-child { border-bottom: none; }
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; flex-shrink: 0;
+}
+.recent-item .info .name { font-weight: 500; color: var(--text); }
+.recent-item .info .meta { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'DM Mono', monospace; }
+.pill {
+  margin-left: auto; font-size: 11px; padding: 2px 8px;
+  border-radius: 99px; font-weight: 500; white-space: nowrap;
+}
+
+/* TABLE */
+.table-toolbar {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+}
+.search-box {
+  flex: 1; max-width: 320px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 8px 14px;
+  color: var(--text); font-size: 13px; font-family: 'Outfit', sans-serif;
+  outline: none;
+}
+.search-box:focus { border-color: var(--accent); }
+.search-box::placeholder { color: var(--text3); }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  text-align: left; padding: 10px 14px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text3);
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+}
+.data-table th:first-child { border-radius: var(--radius) 0 0 0; }
+.data-table th:last-child { border-radius: 0 var(--radius) 0 0; }
+.data-table td {
+  padding: 11px 14px; border-bottom: 1px solid var(--border);
+  font-size: 13px; vertical-align: middle;
+}
+.data-table tr:hover td { background: rgba(255,255,255,0.02); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table .pk { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); }
+.data-table .fk { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent2); }
+.table-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden; overflow-x: auto;
+}
+.table-footer {
+  padding: 12px 14px; background: var(--surface2);
+  border-top: 1px solid var(--border); border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  font-size: 12px; color: var(--text3); font-family: 'DM Mono', monospace;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.pager { display: flex; gap: 4px; }
+.pager button {
+  padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text2); cursor: pointer;
+  font-size: 12px; font-family: 'DM Mono', monospace;
+}
+.pager button:hover { border-color: var(--accent); color: var(--accent); }
+.pager button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* MODAL */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center; z-index: 100;
+}
+.modal {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: var(--radius-lg); width: 520px; max-width: 95vw;
+  max-height: 85vh; overflow-y: auto; padding: 28px;
+}
+.modal h3 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 20px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.07em; }
+.form-group input, .form-group select, .form-group textarea {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 9px 12px;
+  color: var(--text); font-size: 13px; font-family: 'Outfit', sans-serif;
+  outline: none; transition: border-color 0.15s;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+.form-group textarea { resize: vertical; min-height: 80px; }
+.form-group select option { background: var(--surface2); }
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+/* SQL PLAYGROUND */
+.sql-editor {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px;
+  margin-bottom: 16px;
+}
+.sql-editor textarea {
+  width: 100%; background: none; border: none; outline: none;
+  color: var(--accent3); font-family: 'DM Mono', monospace; font-size: 13px;
+  resize: vertical; min-height: 120px; line-height: 1.6;
+}
+.sql-result {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+}
+.sql-result-header {
+  padding: 10px 16px; background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text3);
+  display: flex; justify-content: space-between;
+}
+.sql-error { padding: 16px; color: var(--danger); font-family: 'DM Mono', monospace; font-size: 13px; }
+.sql-empty { padding: 32px; text-align: center; color: var(--text3); }
+.preset-queries { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.preset-btn {
+  padding: 5px 12px; border-radius: 99px;
+  border: 1px solid var(--border2); background: var(--surface2);
+  color: var(--text2); font-size: 12px; cursor: pointer;
+  font-family: 'DM Mono', monospace; transition: all 0.15s;
+}
+.preset-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+
+/* LOADING */
+.loading {
+  position: fixed; inset: 0; background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 999; gap: 20px;
+}
+.loading h2 { font-family: 'DM Serif Display', serif; font-size: 28px; }
+.loading p { color: var(--text2); font-family: 'DM Mono', monospace; font-size: 13px; }
+.spinner {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 3px solid var(--surface3); border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.progress-log {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 16px;
+  max-width: 400px; width: 90%; font-family: 'DM Mono', monospace;
+  font-size: 12px; color: var(--text3); max-height: 160px; overflow-y: auto;
+}
+.progress-log .ok { color: var(--success); }
+
+/* TAGS */
+.tag {
+  display: inline-block; font-size: 11px; padding: 2px 8px;
+  border-radius: 99px; font-weight: 500;
+}
+.tag.green { background: rgba(52,211,153,0.15); color: var(--success); }
+.tag.blue { background: rgba(108,143,255,0.15); color: var(--accent); }
+.tag.purple { background: rgba(167,139,250,0.15); color: var(--accent2); }
+.tag.orange { background: rgba(251,146,60,0.15); color: var(--accent4); }
+.tag.pink { background: rgba(244,114,182,0.15); color: var(--accent5); }
+.tag.gray { background: var(--surface3); color: var(--text2); }
+
+.empty-state {
+  text-align: center; padding: 48px 24px; color: var(--text3);
+}
+.empty-state .icon { font-size: 36px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+</style>
+</head>
+<body>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <h2>LMS Platform</h2>
+  <p>Initializing PGlite database...</p>
+  <div class="progress-log" id="progress-log"></div>
+</div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar" style="display:none">
+  <div class="logo">
+    <h1>LMS</h1>
+    <p>pglite · in-browser postgres</p>
+  </div>
+  <div class="db-status">
+    <div class="dot online" id="db-dot"></div>
+    <span id="db-label">Connected</span>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <button class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
+      <span class="icon">⊞</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="navigate('sql')" id="nav-sql">
+      <span class="icon">❯_</span> SQL Playground
+    </button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Core</div>
+    <button class="nav-item" onclick="navigate('students')" id="nav-students"><span class="icon">👤</span> Students <span class="badge" id="badge-students">…</span></button>
+    <button class="nav-item" onclick="navigate('instructors')" id="nav-instructors"><span class="icon">🎓</span> Instructors <span class="badge" id="badge-instructors">…</span></button>
+    <button class="nav-item" onclick="navigate('courses')" id="nav-courses"><span class="icon">📚</span> Courses <span class="badge" id="badge-courses">…</span></button>
+    <button class="nav-item" onclick="navigate('categories')" id="nav-categories"><span class="icon">🏷</span> Categories <span class="badge" id="badge-categories">…</span></button>
+    <button class="nav-item" onclick="navigate('modules')" id="nav-modules"><span class="icon">📦</span> Modules <span class="badge" id="badge-modules">…</span></button>
+    <button class="nav-item" onclick="navigate('lessons')" id="nav-lessons"><span class="icon">▶</span> Lessons <span class="badge" id="badge-lessons">…</span></button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Assessment</div>
+    <button class="nav-item" onclick="navigate('assignments')" id="nav-assignments"><span class="icon">📝</span> Assignments <span class="badge" id="badge-assignments">…</span></button>
+    <button class="nav-item" onclick="navigate('submissions')" id="nav-submissions"><span class="icon">📤</span> Submissions <span class="badge" id="badge-submissions">…</span></button>
+    <button class="nav-item" onclick="navigate('quizzes')" id="nav-quizzes"><span class="icon">❓</span> Quizzes <span class="badge" id="badge-quizzes">…</span></button>
+    <button class="nav-item" onclick="navigate('questions')" id="nav-questions"><span class="icon">💬</span> Questions <span class="badge" id="badge-questions">…</span></button>
+    <button class="nav-item" onclick="navigate('answer_options')" id="nav-answer_options"><span class="icon">✓</span> Answer Options <span class="badge" id="badge-answer_options">…</span></button>
+    <button class="nav-item" onclick="navigate('quiz_attempts')" id="nav-quiz_attempts"><span class="icon">🎯</span> Quiz Attempts <span class="badge" id="badge-quiz_attempts">…</span></button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Progress</div>
+    <button class="nav-item" onclick="navigate('enrollments')" id="nav-enrollments"><span class="icon">📋</span> Enrollments <span class="badge" id="badge-enrollments">…</span></button>
+    <button class="nav-item" onclick="navigate('certificates')" id="nav-certificates"><span class="icon">🏆</span> Certificates <span class="badge" id="badge-certificates">…</span></button>
+    <button class="nav-item" onclick="navigate('payments')" id="nav-payments"><span class="icon">💳</span> Payments <span class="badge" id="badge-payments">…</span></button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Social</div>
+    <button class="nav-item" onclick="navigate('discussion_forums')" id="nav-discussion_forums"><span class="icon">💭</span> Forums <span class="badge" id="badge-discussion_forums">…</span></button>
+    <button class="nav-item" onclick="navigate('forum_posts')" id="nav-forum_posts"><span class="icon">📣</span> Posts <span class="badge" id="badge-forum_posts">…</span></button>
+    <button class="nav-item" onclick="navigate('reviews')" id="nav-reviews"><span class="icon">⭐</span> Reviews <span class="badge" id="badge-reviews">…</span></button>
+    <button class="nav-item" onclick="navigate('notifications')" id="nav-notifications"><span class="icon">🔔</span> Notifications <span class="badge" id="badge-notifications">…</span></button>
+    <button class="nav-item" onclick="navigate('badges')" id="nav-badges"><span class="icon">🏅</span> Badges <span class="badge" id="badge-badges">…</span></button>
+    <button class="nav-item" onclick="navigate('student_badges')" id="nav-student_badges"><span class="icon">🎖</span> Student Badges <span class="badge" id="badge-student_badges">…</span></button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main" id="main-area" style="display:none">
+  <div class="topbar">
+    <div>
+      <h2 id="page-title">Dashboard</h2>
+    </div>
+    <span class="domain-badge" id="domain-badge" style="display:none"></span>
+    <div class="topbar-actions" id="topbar-actions"></div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<div id="modal-container"></div>
+
+<script type="module">
+import { PGlite } from 'https://cdn.jsdelivr.net/npm/@electric-sql/pglite/dist/index.js';
+
+let db;
+let currentPage = 'dashboard';
+let tablePages = {};
+
+function log(msg, ok=false) {
+  const el = document.getElementById('progress-log');
+  const line = document.createElement('div');
+  line.className = ok ? 'ok' : '';
+  line.textContent = (ok ? '✓ ' : '· ') + msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function initDB() {
+  log('Loading PGlite engine...');
+  db = new PGlite();
+  await db.waitReady;
+  log('PGlite ready', true);
+
+  log('Creating schema...');
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS instructor (
+      instructor_id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL,
+      email VARCHAR(100) NOT NULL UNIQUE, bio TEXT
+    );
+    CREATE TABLE IF NOT EXISTS category (
+      category_id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS student (
+      student_id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL,
+      email VARCHAR(100) NOT NULL UNIQUE, created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    );
+    CREATE TABLE IF NOT EXISTS course (
+      course_id SERIAL PRIMARY KEY, title VARCHAR(200) NOT NULL, description TEXT,
+      price DECIMAL(10,2), instructor_id INT NOT NULL REFERENCES instructor(instructor_id),
+      category_id INT REFERENCES category(category_id)
+    );
+    CREATE TABLE IF NOT EXISTS module (
+      module_id SERIAL PRIMARY KEY, title VARCHAR(200) NOT NULL, sequence INT NOT NULL,
+      course_id INT NOT NULL REFERENCES course(course_id)
+    );
+    CREATE TABLE IF NOT EXISTS lesson (
+      lesson_id SERIAL PRIMARY KEY, title VARCHAR(200) NOT NULL, content TEXT,
+      duration INT, module_id INT NOT NULL REFERENCES module(module_id)
+    );
+    CREATE TABLE IF NOT EXISTS assignment (
+      assignment_id SERIAL PRIMARY KEY, title VARCHAR(200) NOT NULL,
+      due_date DATE, course_id INT NOT NULL REFERENCES course(course_id)
+    );
+    CREATE TABLE IF NOT EXISTS submission (
+      submission_id SERIAL PRIMARY KEY, submitted_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      grade DECIMAL(5,2), student_id INT NOT NULL REFERENCES student(student_id),
+      assignment_id INT NOT NULL REFERENCES assignment(assignment_id)
+    );
+    CREATE TABLE IF NOT EXISTS quiz (
+      quiz_id SERIAL PRIMARY KEY, title VARCHAR(200) NOT NULL,
+      time_limit INT, course_id INT NOT NULL REFERENCES course(course_id)
+    );
+    CREATE TABLE IF NOT EXISTS question (
+      question_id SERIAL PRIMARY KEY, question_text TEXT NOT NULL,
+      type VARCHAR(50), quiz_id INT NOT NULL REFERENCES quiz(quiz_id)
+    );
+    CREATE TABLE IF NOT EXISTS answer_option (
+      option_id SERIAL PRIMARY KEY, option_text VARCHAR(300) NOT NULL,
+      is_correct BOOLEAN NOT NULL DEFAULT FALSE,
+      question_id INT NOT NULL REFERENCES question(question_id)
+    );
+    CREATE TABLE IF NOT EXISTS quiz_attempt (
+      attempt_id SERIAL PRIMARY KEY, score DECIMAL(5,2),
+      student_id INT NOT NULL REFERENCES student(student_id),
+      quiz_id INT NOT NULL REFERENCES quiz(quiz_id)
+    );
+    CREATE TABLE IF NOT EXISTS enrollment (
+      enrollment_id SERIAL PRIMARY KEY, enrolled_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      status VARCHAR(50), student_id INT NOT NULL REFERENCES student(student_id),
+      course_id INT NOT NULL REFERENCES course(course_id)
+    );
+    CREATE TABLE IF NOT EXISTS certificate (
+      certificate_id SERIAL PRIMARY KEY, issued_date DATE NOT NULL,
+      cert_url VARCHAR(500), enrollment_id INT NOT NULL UNIQUE REFERENCES enrollment(enrollment_id)
+    );
+    CREATE TABLE IF NOT EXISTS payment (
+      payment_id SERIAL PRIMARY KEY, amount DECIMAL(10,2) NOT NULL,
+      status VARCHAR(50), student_id INT NOT NULL REFERENCES student(student_id)
+    );
+    CREATE TABLE IF NOT EXISTS discussion_forum (
+      forum_id SERIAL PRIMARY KEY, title VARCHAR(200) NOT NULL,
+      course_id INT NOT NULL REFERENCES course(course_id)
+    );
+    CREATE TABLE IF NOT EXISTS forum_post (
+      post_id SERIAL PRIMARY KEY, content TEXT NOT NULL,
+      parent_post_id INT REFERENCES forum_post(post_id),
+      forum_id INT NOT NULL REFERENCES discussion_forum(forum_id)
+    );
+    CREATE TABLE IF NOT EXISTS review (
+      review_id SERIAL PRIMARY KEY, rating INT CHECK (rating BETWEEN 1 AND 5),
+      comment TEXT, student_id INT NOT NULL REFERENCES student(student_id),
+      course_id INT NOT NULL REFERENCES course(course_id)
+    );
+    CREATE TABLE IF NOT EXISTS notification (
+      notification_id SERIAL PRIMARY KEY, message TEXT NOT NULL,
+      is_read BOOLEAN NOT NULL DEFAULT FALSE,
+      student_id INT NOT NULL REFERENCES student(student_id)
+    );
+    CREATE TABLE IF NOT EXISTS badge (
+      badge_id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL,
+      icon_url VARCHAR(500), criteria TEXT
+    );
+    CREATE TABLE IF NOT EXISTS student_badge (
+      student_id INT NOT NULL REFERENCES student(student_id),
+      badge_id INT NOT NULL REFERENCES badge(badge_id),
+      PRIMARY KEY (student_id, badge_id)
+    );
+  `);
+  log('Schema created (21 tables)', true);
+
+  log('Inserting sample data...');
+  await db.exec(`
+    INSERT INTO category (name) VALUES
+      ('Programming'),('Web Development'),('Data Science'),
+      ('Design'),('Business'),('DevOps');
+
+    INSERT INTO instructor (name, email, bio) VALUES
+      ('Dr. Sarah Mitchell','sarah.mitchell@lms.dev','PhD in Computer Science, 12 years teaching experience in ML and algorithms.'),
+      ('James Okafor','james.okafor@lms.dev','Full-stack engineer with 8 years at top tech companies. Specializes in React and Node.'),
+      ('Priya Sharma','priya.sharma@lms.dev','Senior data scientist at a Fortune 500 company. Expert in Python and statistics.'),
+      ('Carlos Mendez','carlos.mendez@lms.dev','UX/UI designer with 10 years crafting digital products for global brands.'),
+      ('Emily Chen','emily.chen@lms.dev','DevOps architect with expertise in Kubernetes, CI/CD, and cloud infrastructure.');
+
+    INSERT INTO student (name, email, created_at) VALUES
+      ('Alex Johnson','alex.j@student.dev','2024-01-15 09:00:00'),
+      ('Maria Garcia','maria.g@student.dev','2024-01-20 10:30:00'),
+      ('Tom Williams','tom.w@student.dev','2024-02-01 08:15:00'),
+      ('Aisha Patel','aisha.p@student.dev','2024-02-10 14:00:00'),
+      ('Liam Brown','liam.b@student.dev','2024-02-14 11:45:00'),
+      ('Sophie Lee','sophie.l@student.dev','2024-03-01 09:30:00'),
+      ('Noah Davis','noah.d@student.dev','2024-03-05 16:00:00'),
+      ('Fatima Al-Hassan','fatima.a@student.dev','2024-03-10 12:00:00'),
+      ('Oliver Smith','oliver.s@student.dev','2024-03-20 10:00:00'),
+      ('Chloe Martin','chloe.m@student.dev','2024-04-01 08:00:00');
+
+    INSERT INTO course (title, description, price, instructor_id, category_id) VALUES
+      ('Python for Data Science','Master Python programming with a focus on data analysis, NumPy, Pandas and visualization.',79.99,3,3),
+      ('Full-Stack Web Development','Build modern web apps with React, Node.js, PostgreSQL and RESTful APIs.',99.99,2,2),
+      ('Machine Learning Fundamentals','Understand core ML algorithms, model evaluation, and practical implementations.',89.99,1,3),
+      ('UI/UX Design Masterclass','Design beautiful, user-centered digital products using Figma and design systems.',69.99,4,4),
+      ('DevOps & Kubernetes','Learn containerization, orchestration, CI/CD pipelines and cloud deployments.',109.99,5,6),
+      ('Algorithms & Data Structures','Deep dive into essential CS concepts: sorting, graphs, trees and dynamic programming.',74.99,1,1);
+
+    INSERT INTO module (title, sequence, course_id) VALUES
+      ('Python Basics',1,1),('Data Manipulation with Pandas',2,1),('Data Visualization',3,1),
+      ('HTML & CSS Fundamentals',1,2),('JavaScript & React',2,2),('Backend with Node.js',3,2),
+      ('Intro to Machine Learning',1,3),('Supervised Learning',2,3),('Model Evaluation',3,3),
+      ('Design Principles',1,4),('Figma Essentials',2,4),('Prototyping',3,4),
+      ('Docker & Containers',1,5),('Kubernetes Basics',2,5),('CI/CD Pipelines',3,5),
+      ('Arrays & Sorting',1,6),('Trees & Graphs',2,6),('Dynamic Programming',3,6);
+
+    INSERT INTO lesson (title, content, duration, module_id) VALUES
+      ('Variables and Data Types','Introduction to Python variables, integers, strings, floats and booleans.',15,1),
+      ('Control Flow','If statements, loops, and list comprehensions in Python.',20,1),
+      ('Functions & Modules','Defining functions, scope, lambda expressions, and importing modules.',25,1),
+      ('Introduction to Pandas','DataFrames, Series, reading CSV and JSON data.',30,2),
+      ('Data Cleaning','Handling nulls, duplicates, type casting and data transformation.',35,2),
+      ('Matplotlib & Seaborn','Creating bar charts, scatter plots, histograms and heatmaps.',25,3),
+      ('The Box Model','Understanding margin, padding, borders and the CSS box model.',20,4),
+      ('Flexbox & Grid','Modern CSS layout techniques with Flexbox and Grid.',25,4),
+      ('React Components','Functional components, JSX, props and state.',30,5),
+      ('React Hooks','useState, useEffect, useContext and custom hooks.',35,5),
+      ('Express.js REST API','Building RESTful APIs with Express and middleware.',40,6),
+      ('What is Machine Learning?','Overview of supervised, unsupervised and reinforcement learning.',20,7),
+      ('Linear Regression','Understanding the linear model, cost function and gradient descent.',35,8),
+      ('Decision Trees','Tree construction, splitting criteria and pruning.',30,8),
+      ('Accuracy & Confusion Matrix','Precision, recall, F1-score and ROC curves.',25,9),
+      ('Design Thinking','Empathize, define, ideate, prototype and test.',20,10),
+      ('Color Theory','Hue, saturation, contrast and accessible color palettes.',25,10),
+      ('Figma Interface','Components, auto-layout, constraints and variants.',30,11),
+      ('Interactive Prototypes','Connecting frames and creating interactive flows in Figma.',35,12),
+      ('Docker Images','Building images with Dockerfiles, layers and caching.',30,13),
+      ('Pods & Deployments','Creating Kubernetes pods, deployments and services.',35,14),
+      ('GitHub Actions','Setting up automated workflows, tests and deployments.',30,15),
+      ('Big O Notation','Time and space complexity analysis.',20,16),
+      ('Merge Sort & Quick Sort','Divide-and-conquer sorting algorithms with implementation.',30,16),
+      ('Binary Trees','Node structure, traversals and BSTs.',35,17),
+      ('Graph BFS & DFS','Breadth-first and depth-first search on adjacency lists.',40,17),
+      ('Fibonacci & Memoization','Top-down and bottom-up dynamic programming approaches.',35,18);
+
+    INSERT INTO assignment (title, due_date, course_id) VALUES
+      ('Pandas Data Analysis Project','2024-05-01',1),
+      ('Build a Data Dashboard','2024-05-15',1),
+      ('React To-Do App','2024-05-10',2),
+      ('Full-Stack Blog API','2024-05-25',2),
+      ('Implement Linear Regression','2024-05-20',3),
+      ('ML Model Report','2024-06-01',3),
+      ('Redesign a Mobile App','2024-05-18',4),
+      ('Sorting Algorithm Implementation','2024-05-22',6),
+      ('Graph Traversal Assignment','2024-06-05',6);
+
+    INSERT INTO submission (submitted_at, grade, student_id, assignment_id) VALUES
+      ('2024-04-30 14:30:00',92.5,1,1),('2024-04-29 11:00:00',88.0,2,1),
+      ('2024-05-09 16:00:00',95.0,1,3),('2024-05-10 09:00:00',79.5,3,3),
+      ('2024-05-08 13:00:00',87.0,4,3),('2024-05-19 10:30:00',91.0,5,5),
+      ('2024-05-18 15:00:00',84.5,6,5),('2024-05-17 12:00:00',76.0,7,7),
+      ('2024-05-20 11:00:00',98.0,8,8),('2024-05-21 14:00:00',85.5,9,8);
+
+    INSERT INTO quiz (title, time_limit, course_id) VALUES
+      ('Python Basics Quiz',30,1),('Pandas Quiz',20,1),
+      ('JavaScript Quiz',25,2),('React Quiz',30,2),
+      ('ML Concepts Quiz',35,3),('Algorithm Quiz',40,6),
+      ('CSS Layout Quiz',20,2),('Design Principles Quiz',25,4);
+
+    INSERT INTO question (question_text, type, quiz_id) VALUES
+      ('What is the output of print(type(3.14))?','mcq',1),
+      ('Which method removes duplicates from a Pandas DataFrame?','mcq',2),
+      ('What does the === operator check in JavaScript?','mcq',3),
+      ('Which hook is used for side effects in React?','mcq',4),
+      ('What is overfitting in machine learning?','mcq',5),
+      ('What is the time complexity of QuickSort on average?','mcq',6),
+      ('Which CSS property is used to create a flex container?','mcq',7),
+      ('What does UX stand for?','mcq',8),
+      ('How do you define a function in Python?','mcq',1),
+      ('What is a Pandas Series?','mcq',2);
+
+    INSERT INTO answer_option (option_text, is_correct, question_id) VALUES
+      ('<class float>',TRUE,1),('<class int>',FALSE,1),('<class num>',FALSE,1),('float',FALSE,1),
+      ('drop_duplicates()',TRUE,2),('remove_dupes()',FALSE,2),('unique()',FALSE,2),('deduplicate()',FALSE,2),
+      ('Value and type equality',TRUE,3),('Value equality only',FALSE,3),('Type equality only',FALSE,3),('Assignment',FALSE,3),
+      ('useEffect',TRUE,4),('useState',FALSE,4),('useRef',FALSE,4),('useMemo',FALSE,4),
+      ('Model performs well on training but poorly on new data',TRUE,5),('Model performs poorly on all data',FALSE,5),('Model underfits training data',FALSE,5),('Model is too simple',FALSE,5),
+      ('O(n log n)',TRUE,6),('O(n²)',FALSE,6),('O(n)',FALSE,6),('O(log n)',FALSE,6),
+      ('display: flex',TRUE,7),('flex: 1',FALSE,7),('flexbox: on',FALSE,7),('container: flex',FALSE,7),
+      ('User Experience',TRUE,8),('Universal Experience',FALSE,8),('User Execution',FALSE,8),('Unified Experience',FALSE,8),
+      ('def function_name():',TRUE,9),('function function_name():',FALSE,9),('define function_name():',FALSE,9),('fun function_name():',FALSE,9),
+      ('A one-dimensional labeled array',TRUE,10),('A two-dimensional table',FALSE,10),('A list of lists',FALSE,10),('A dictionary of columns',FALSE,10);
+
+    INSERT INTO quiz_attempt (score, student_id, quiz_id) VALUES
+      (85.0,1,1),(90.0,2,1),(78.5,3,1),(92.0,1,2),(88.0,4,2),
+      (76.0,5,3),(95.0,1,3),(82.5,6,4),(89.0,7,4),(91.0,8,5),
+      (73.0,9,5),(88.5,10,6),(94.0,2,7),(79.0,3,8),(87.5,5,6);
+
+    INSERT INTO enrollment (enrolled_at, status, student_id, course_id) VALUES
+      ('2024-01-16 09:00:00','completed',1,1),('2024-01-20 10:00:00','active',1,2),
+      ('2024-01-21 11:00:00','completed',2,1),('2024-02-02 09:30:00','active',3,2),
+      ('2024-02-11 14:30:00','active',4,3),('2024-02-14 12:00:00','active',5,3),
+      ('2024-03-02 09:00:00','active',6,4),('2024-03-05 16:30:00','active',7,6),
+      ('2024-03-10 13:00:00','completed',8,6),('2024-03-20 10:30:00','active',9,5),
+      ('2024-04-01 08:30:00','active',10,1),('2024-01-22 15:00:00','active',2,3),
+      ('2024-02-15 10:00:00','active',3,4),('2024-03-06 11:00:00','active',4,2),
+      ('2024-03-11 09:00:00','active',5,1);
+
+    INSERT INTO certificate (issued_date, cert_url, enrollment_id) VALUES
+      ('2024-04-20','https://lms.dev/cert/abc123',1),
+      ('2024-04-25','https://lms.dev/cert/def456',3),
+      ('2024-05-01','https://lms.dev/cert/ghi789',9);
+
+    INSERT INTO payment (amount, status, student_id) VALUES
+      (79.99,'completed',1),(99.99,'completed',1),(79.99,'completed',2),
+      (99.99,'completed',3),(89.99,'completed',4),(89.99,'completed',5),
+      (69.99,'completed',6),(74.99,'completed',7),(74.99,'completed',8),
+      (109.99,'completed',9),(79.99,'completed',10),(89.99,'pending',3),
+      (99.99,'completed',4),(79.99,'completed',5);
+
+    INSERT INTO discussion_forum (title, course_id) VALUES
+      ('Python General Discussion',1),('Pandas Help & Tips',1),
+      ('React Q&A Forum',2),('Backend Discussion',2),
+      ('ML Concepts Forum',3),('Design Critique',4),
+      ('DevOps Community',5),('Algorithms Study Group',6);
+
+    INSERT INTO forum_post (content, parent_post_id, forum_id) VALUES
+      ('Has anyone tried using walrus operator in Python 3.8+ with Pandas?',NULL,1),
+      ('Yes! It is great for filtering. Try: if (n := len(df)) > 10: print(n)',1,1),
+      ('How do I handle timezone-aware datetimes in Pandas?',NULL,2),
+      ('Use pd.to_datetime with utc=True then convert with tz_convert.',3,2),
+      ('What is the best way to manage global state in React?',NULL,3),
+      ('Context API works great for small apps. For larger ones, consider Zustand or Redux Toolkit.',5,3),
+      ('I prefer Zustand! Much simpler than Redux.',6,3),
+      ('Can someone explain the bias-variance tradeoff?',NULL,5),
+      ('High bias = underfitting (too simple). High variance = overfitting (too complex). You want the sweet spot.',8,5),
+      ('Should I use Figma auto-layout or manual frames for responsive design?',NULL,6),
+      ('Always auto-layout! It saves so much time for responsive components.',10,6),
+      ('What is the difference between BFS and DFS?',NULL,8),
+      ('BFS uses a queue and explores level by level. DFS uses a stack and goes deep first.',12,8);
+
+    INSERT INTO review (rating, comment, student_id, course_id) VALUES
+      (5,'Excellent course! Dr. Mitchell explains complex topics clearly. The assignments were challenging but fair.',1,1),
+      (4,'Great content on React. Would love more coverage on testing.',1,2),
+      (5,'James is an amazing instructor. The full-stack project was very practical.',2,2),
+      (5,'Best ML course I have taken. Perfect balance of theory and practice.',4,3),
+      (4,'Very informative. The Figma section was my favorite.',6,4),
+      (5,'Extremely practical DevOps content. I got a job offer after finishing!',9,5),
+      (5,'The algorithms course is incredibly rigorous. Sarah is brilliant.',7,6),
+      (4,'Python fundamentals were solid. Would love more advanced topics.',10,1),
+      (3,'Good course but pacing was too fast in some sections.',3,2),
+      (5,'Data visualization section was fantastic. Beautiful plots and great explanations.',2,1);
+
+    INSERT INTO notification (message, is_read, student_id) VALUES
+      ('Your submission for Pandas Data Analysis Project has been graded: 92.5/100',TRUE,1),
+      ('New assignment posted: Build a Data Dashboard. Due: May 15.',FALSE,1),
+      ('Your certificate for Python for Data Science is ready!',TRUE,1),
+      ('Your submission for React To-Do App has been graded: 79.5/100',TRUE,3),
+      ('Enrollment confirmed: Machine Learning Fundamentals',TRUE,4),
+      ('Quiz results: ML Concepts Quiz — Score: 91/100',TRUE,8),
+      ('New forum reply in Algorithms Study Group.',FALSE,7),
+      ('Congratulations! You earned the Fast Learner badge.',TRUE,2),
+      ('Payment received: $89.99 for Machine Learning Fundamentals.',TRUE,5),
+      ('Your submission for Graph Traversal Assignment has been graded: 85.5/100',FALSE,9),
+      ('New lesson available: Dynamic Programming',FALSE,10),
+      ('Weekly reminder: You have 2 pending assignments.',FALSE,3);
+
+    INSERT INTO badge (name, icon_url, criteria) VALUES
+      ('First Enrollment','https://lms.dev/badges/first-enroll.png','Enroll in your first course'),
+      ('Fast Learner','https://lms.dev/badges/fast-learner.png','Complete a course within 30 days of enrollment'),
+      ('Perfect Score','https://lms.dev/badges/perfect.png','Score 100% on any quiz or assignment'),
+      ('Prolific Student','https://lms.dev/badges/prolific.png','Enroll in 3 or more courses'),
+      ('Top Reviewer','https://lms.dev/badges/reviewer.png','Submit 3 or more course reviews'),
+      ('Discussion Leader','https://lms.dev/badges/discussion.png','Post 10 or more forum messages'),
+      ('Certified','https://lms.dev/badges/certified.png','Earn your first certificate');
+
+    INSERT INTO student_badge (student_id, badge_id) VALUES
+      (1,1),(1,2),(1,4),(1,7),(2,1),(2,2),(2,7),(3,1),(4,1),(4,4),
+      (5,1),(6,1),(7,1),(7,5),(8,1),(8,3),(9,1),(10,1);
+  `);
+  log('Sample data inserted', true);
+  log('All done — loading app...', true);
+}
+
+// TABLE CONFIG
+const tableConfig = {
+  students: { table:'student', pk:'student_id', title:'Students', domain:'Core', domainColor:'blue',
+    cols:['student_id','name','email','created_at'],
+    labels:['ID','Name','Email','Joined'],
+    form:[{k:'name',l:'Name',t:'text'},{k:'email',l:'Email',t:'email'},{k:'created_at',l:'Joined At',t:'datetime-local'}]
+  },
+  instructors: { table:'instructor', pk:'instructor_id', title:'Instructors', domain:'Core', domainColor:'blue',
+    cols:['instructor_id','name','email','bio'],
+    labels:['ID','Name','Email','Bio'],
+    form:[{k:'name',l:'Name',t:'text'},{k:'email',l:'Email',t:'email'},{k:'bio',l:'Bio',t:'textarea'}]
+  },
+  courses: { table:'course', pk:'course_id', title:'Courses', domain:'Core', domainColor:'blue',
+    cols:['course_id','title','price','instructor_id','category_id'],
+    labels:['ID','Title','Price','Instructor ID','Category ID'],
+    form:[{k:'title',l:'Title',t:'text'},{k:'description',l:'Description',t:'textarea'},{k:'price',l:'Price ($)',t:'number'},{k:'instructor_id',l:'Instructor ID',t:'number'},{k:'category_id',l:'Category ID',t:'number'}]
+  },
+  categories: { table:'category', pk:'category_id', title:'Categories', domain:'Core', domainColor:'blue',
+    cols:['category_id','name'], labels:['ID','Name'],
+    form:[{k:'name',l:'Name',t:'text'}]
+  },
+  modules: { table:'module', pk:'module_id', title:'Modules', domain:'Core', domainColor:'blue',
+    cols:['module_id','title','sequence','course_id'], labels:['ID','Title','Order','Course ID'],
+    form:[{k:'title',l:'Title',t:'text'},{k:'sequence',l:'Sequence',t:'number'},{k:'course_id',l:'Course ID',t:'number'}]
+  },
+  lessons: { table:'lesson', pk:'lesson_id', title:'Lessons', domain:'Core', domainColor:'blue',
+    cols:['lesson_id','title','duration','module_id'], labels:['ID','Title','Duration (min)','Module ID'],
+    form:[{k:'title',l:'Title',t:'text'},{k:'content',l:'Content',t:'textarea'},{k:'duration',l:'Duration (min)',t:'number'},{k:'module_id',l:'Module ID',t:'number'}]
+  },
+  assignments: { table:'assignment', pk:'assignment_id', title:'Assignments', domain:'Assessment', domainColor:'orange',
+    cols:['assignment_id','title','due_date','course_id'], labels:['ID','Title','Due Date','Course ID'],
+    form:[{k:'title',l:'Title',t:'text'},{k:'due_date',l:'Due Date',t:'date'},{k:'course_id',l:'Course ID',t:'number'}]
+  },
+  submissions: { table:'submission', pk:'submission_id', title:'Submissions', domain:'Assessment', domainColor:'orange',
+    cols:['submission_id','submitted_at','grade','student_id','assignment_id'], labels:['ID','Submitted At','Grade','Student ID','Assignment ID'],
+    form:[{k:'submitted_at',l:'Submitted At',t:'datetime-local'},{k:'grade',l:'Grade',t:'number'},{k:'student_id',l:'Student ID',t:'number'},{k:'assignment_id',l:'Assignment ID',t:'number'}]
+  },
+  quizzes: { table:'quiz', pk:'quiz_id', title:'Quizzes', domain:'Assessment', domainColor:'orange',
+    cols:['quiz_id','title','time_limit','course_id'], labels:['ID','Title','Time Limit (min)','Course ID'],
+    form:[{k:'title',l:'Title',t:'text'},{k:'time_limit',l:'Time Limit (min)',t:'number'},{k:'course_id',l:'Course ID',t:'number'}]
+  },
+  questions: { table:'question', pk:'question_id', title:'Questions', domain:'Assessment', domainColor:'orange',
+    cols:['question_id','question_text','type','quiz_id'], labels:['ID','Question','Type','Quiz ID'],
+    form:[{k:'question_text',l:'Question Text',t:'textarea'},{k:'type',l:'Type',t:'text'},{k:'quiz_id',l:'Quiz ID',t:'number'}]
+  },
+  answer_options: { table:'answer_option', pk:'option_id', title:'Answer Options', domain:'Assessment', domainColor:'orange',
+    cols:['option_id','option_text','is_correct','question_id'], labels:['ID','Option Text','Correct?','Question ID'],
+    form:[{k:'option_text',l:'Option Text',t:'text'},{k:'is_correct',l:'Is Correct',t:'checkbox'},{k:'question_id',l:'Question ID',t:'number'}]
+  },
+  quiz_attempts: { table:'quiz_attempt', pk:'attempt_id', title:'Quiz Attempts', domain:'Assessment', domainColor:'orange',
+    cols:['attempt_id','score','student_id','quiz_id'], labels:['ID','Score','Student ID','Quiz ID'],
+    form:[{k:'score',l:'Score',t:'number'},{k:'student_id',l:'Student ID',t:'number'},{k:'quiz_id',l:'Quiz ID',t:'number'}]
+  },
+  enrollments: { table:'enrollment', pk:'enrollment_id', title:'Enrollments', domain:'Progress', domainColor:'green',
+    cols:['enrollment_id','enrolled_at','status','student_id','course_id'], labels:['ID','Enrolled At','Status','Student ID','Course ID'],
+    form:[{k:'enrolled_at',l:'Enrolled At',t:'datetime-local'},{k:'status',l:'Status',t:'text'},{k:'student_id',l:'Student ID',t:'number'},{k:'course_id',l:'Course ID',t:'number'}]
+  },
+  certificates: { table:'certificate', pk:'certificate_id', title:'Certificates', domain:'Progress', domainColor:'green',
+    cols:['certificate_id','issued_date','cert_url','enrollment_id'], labels:['ID','Issued Date','URL','Enrollment ID'],
+    form:[{k:'issued_date',l:'Issued Date',t:'date'},{k:'cert_url',l:'Certificate URL',t:'text'},{k:'enrollment_id',l:'Enrollment ID',t:'number'}]
+  },
+  payments: { table:'payment', pk:'payment_id', title:'Payments', domain:'Progress', domainColor:'green',
+    cols:['payment_id','amount','status','student_id'], labels:['ID','Amount','Status','Student ID'],
+    form:[{k:'amount',l:'Amount ($)',t:'number'},{k:'status',l:'Status',t:'text'},{k:'student_id',l:'Student ID',t:'number'}]
+  },
+  discussion_forums: { table:'discussion_forum', pk:'forum_id', title:'Discussion Forums', domain:'Social', domainColor:'pink',
+    cols:['forum_id','title','course_id'], labels:['ID','Title','Course ID'],
+    form:[{k:'title',l:'Title',t:'text'},{k:'course_id',l:'Course ID',t:'number'}]
+  },
+  forum_posts: { table:'forum_post', pk:'post_id', title:'Forum Posts', domain:'Social', domainColor:'pink',
+    cols:['post_id','content','parent_post_id','forum_id'], labels:['ID','Content','Parent Post ID','Forum ID'],
+    form:[{k:'content',l:'Content',t:'textarea'},{k:'parent_post_id',l:'Parent Post ID (optional)',t:'number'},{k:'forum_id',l:'Forum ID',t:'number'}]
+  },
+  reviews: { table:'review', pk:'review_id', title:'Reviews', domain:'Social', domainColor:'pink',
+    cols:['review_id','rating','comment','student_id','course_id'], labels:['ID','Rating','Comment','Student ID','Course ID'],
+    form:[{k:'rating',l:'Rating (1-5)',t:'number'},{k:'comment',l:'Comment',t:'textarea'},{k:'student_id',l:'Student ID',t:'number'},{k:'course_id',l:'Course ID',t:'number'}]
+  },
+  notifications: { table:'notification', pk:'notification_id', title:'Notifications', domain:'Social', domainColor:'pink',
+    cols:['notification_id','message','is_read','student_id'], labels:['ID','Message','Read?','Student ID'],
+    form:[{k:'message',l:'Message',t:'textarea'},{k:'is_read',l:'Is Read',t:'checkbox'},{k:'student_id',l:'Student ID',t:'number'}]
+  },
+  badges: { table:'badge', pk:'badge_id', title:'Badges', domain:'Social', domainColor:'pink',
+    cols:['badge_id','name','criteria'], labels:['ID','Name','Criteria'],
+    form:[{k:'name',l:'Name',t:'text'},{k:'criteria',l:'Criteria',t:'textarea'},{k:'icon_url',l:'Icon URL',t:'text'}]
+  },
+  student_badges: { table:'student_badge', pk:null, title:'Student Badges', domain:'Social', domainColor:'pink',
+    cols:['student_id','badge_id'], labels:['Student ID','Badge ID'],
+    form:[{k:'student_id',l:'Student ID',t:'number'},{k:'badge_id',l:'Badge ID',t:'number'}]
+  },
+};
+
+const domainColors = { Core:'blue', Assessment:'orange', Progress:'green', Social:'pink' };
+
+async function updateBadges() {
+  for (const [nav, cfg] of Object.entries(tableConfig)) {
+    try {
+      const r = await db.query(`SELECT COUNT(*) as c FROM ${cfg.table}`);
+      const el = document.getElementById('badge-' + nav);
+      if (el) el.textContent = r.rows[0].c;
+    } catch(e) {}
+  }
+}
+
+function navigate(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const nav = document.getElementById('nav-' + page);
+  if (nav) nav.classList.add('active');
+
+  const title = document.getElementById('page-title');
+  const badge = document.getElementById('domain-badge');
+  const actions = document.getElementById('topbar-actions');
+  badge.style.display = 'none';
+  actions.innerHTML = '';
+
+  if (page === 'dashboard') {
+    title.textContent = 'Dashboard';
+    renderDashboard();
+  } else if (page === 'sql') {
+    title.textContent = 'SQL Playground';
+    renderSQL();
+  } else if (tableConfig[page]) {
+    const cfg = tableConfig[page];
+    title.textContent = cfg.title;
+    badge.style.display = '';
+    badge.textContent = cfg.domain;
+    badge.style.cssText = `background:rgba(108,143,255,0.12);color:var(--accent);padding:3px 10px;border-radius:99px;font-size:11px;font-family:'DM Mono',monospace`;
+    if (cfg.domain === 'Assessment') badge.style.cssText = badge.style.cssText.replace('rgba(108,143,255,0.12)','rgba(251,146,60,0.12)').replace('var(--accent)','var(--accent4)');
+    if (cfg.domain === 'Progress') badge.style.cssText = badge.style.cssText.replace('rgba(108,143,255,0.12)','rgba(52,211,153,0.12)').replace('var(--accent)','var(--accent3)');
+    if (cfg.domain === 'Social') badge.style.cssText = badge.style.cssText.replace('rgba(108,143,255,0.12)','rgba(244,114,182,0.12)').replace('var(--accent)','var(--accent5)');
+    actions.innerHTML = `<button class="btn primary" onclick="openAddModal('${page}')">+ Add Row</button>`;
+    renderTable(page);
+  }
+  window._currentPage = page;
+}
+
+async function renderDashboard() {
+  const content = document.getElementById('content');
+  const counts = {};
+  const tables = ['student','course','enrollment','payment'];
+  for (const t of tables) {
+    const r = await db.query(`SELECT COUNT(*) as c FROM ${t}`);
+    counts[t] = r.rows[0].c;
+  }
+  const revRes = await db.query(`SELECT SUM(amount) as total FROM payment WHERE status='completed'`);
+  const rev = parseFloat(revRes.rows[0].total || 0).toFixed(2);
+  const recentStudents = await db.query(`SELECT * FROM student ORDER BY created_at DESC LIMIT 5`);
+  const recentCourses = await db.query(`SELECT c.*, i.name as instructor_name FROM course c JOIN instructor i ON c.instructor_id=i.instructor_id ORDER BY c.course_id DESC LIMIT 5`);
+  const recentEnrollments = await db.query(`SELECT e.*, s.name as student_name, co.title as course_title FROM enrollment e JOIN student s ON e.student_id=s.student_id JOIN course co ON e.course_id=co.course_id ORDER BY e.enrolled_at DESC LIMIT 5`);
+
+  const avatarColors = ['#6c8fff','#a78bfa','#34d399','#fb923c','#f472b6'];
+  const initials = n => n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const statusPill = s => {
+    const m = {completed:'green',active:'blue',pending:'orange'};
+    return `<span class="pill tag ${m[s]||'gray'}">${s}</span>`;
+  };
+
+  content.innerHTML = `
+    <div class="dashboard-grid">
+      <div class="stat-card"><div class="label">Total Students</div><div class="value" style="color:var(--accent)">${counts['student']}</div><div class="sub">registered users</div></div>
+      <div class="stat-card"><div class="label">Active Courses</div><div class="value" style="color:var(--accent2)">${counts['course']}</div><div class="sub">across 6 categories</div></div>
+      <div class="stat-card"><div class="label">Enrollments</div><div class="value" style="color:var(--accent3)">${counts['enrollment']}</div><div class="sub">total enrollments</div></div>
+      <div class="stat-card"><div class="label">Revenue</div><div class="value" style="color:var(--accent4)">$${rev}</div><div class="sub">completed payments</div></div>
+    </div>
+    <div class="two-col" style="margin-bottom:16px">
+      <div class="card">
+        <h3>Recent Students</h3>
+        ${recentStudents.rows.map((s,i) => `
+          <div class="recent-item">
+            <div class="avatar" style="background:${avatarColors[i%5]}22;color:${avatarColors[i%5]}">${initials(s.name)}</div>
+            <div class="info"><div class="name">${s.name}</div><div class="meta">${s.email}</div></div>
+            <span class="tag blue" style="margin-left:auto;font-size:11px">#${s.student_id}</span>
+          </div>`).join('')}
+      </div>
+      <div class="card">
+        <h3>Recent Enrollments</h3>
+        ${recentEnrollments.rows.map(e => `
+          <div class="recent-item">
+            <div class="info" style="flex:1">
+              <div class="name">${e.student_name}</div>
+              <div class="meta">${e.course_title}</div>
+            </div>
+            ${statusPill(e.status)}
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <h3>Courses</h3>
+      ${recentCourses.rows.map(c => `
+        <div class="recent-item">
+          <div class="info" style="flex:1"><div class="name">${c.title}</div><div class="meta">by ${c.instructor_name}</div></div>
+          <span class="tag green" style="margin-left:8px">$${c.price}</span>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+async function renderTable(page, searchTerm='') {
+  const cfg = tableConfig[page];
+  if (!cfg) return;
+  const content = document.getElementById('content');
+  const pageNum = tablePages[page] || 1;
+  const perPage = 15;
+  const offset = (pageNum - 1) * perPage;
+  let where = '';
+  if (searchTerm && cfg.cols.length > 1) {
+    const textCols = cfg.cols.filter(c => !c.endsWith('_id') && c !== cfg.pk);
+    if (textCols.length > 0) {
+      where = `WHERE ${textCols.map(c=>`CAST(${c} AS TEXT) ILIKE '%${searchTerm.replace(/'/g,"''")}%'`).join(' OR ')}`;
+    }
+  }
+  const total = await db.query(`SELECT COUNT(*) as c FROM ${cfg.table} ${where}`);
+  const totalRows = parseInt(total.rows[0].c);
+  const totalPages = Math.ceil(totalRows / perPage);
+  const rows = await db.query(`SELECT ${cfg.cols.join(',')} FROM ${cfg.table} ${where} ORDER BY ${cfg.pk || cfg.cols[0]} ${cfg.pk?'DESC':''} LIMIT ${perPage} OFFSET ${offset}`);
+
+  const formatCell = (col, val, cfg) => {
+    if (val === null || val === undefined) return `<span style="color:var(--text3);font-style:italic">null</span>`;
+    if (col === cfg.pk) return `<span class="pk">${val}</span>`;
+    if (col.endsWith('_id') && col !== cfg.pk) return `<span class="fk">${val}</span>`;
+    if (typeof val === 'boolean') return val ? `<span class="tag green">true</span>` : `<span class="tag gray">false</span>`;
+    if (col === 'status') {
+      const m = {completed:'green',active:'blue',pending:'orange'};
+      return `<span class="tag ${m[val]||'gray'}">${val}</span>`;
+    }
+    if (col === 'rating') return '⭐'.repeat(parseInt(val));
+    if (col === 'price' || col === 'amount') return `$${parseFloat(val).toFixed(2)}`;
+    if (col === 'grade' || col === 'score') return `<span style="color:var(--accent3);font-weight:500">${parseFloat(val).toFixed(1)}</span>`;
+    const str = String(val);
+    return str.length > 60 ? str.slice(0,60) + '…' : str;
+  };
+
+  const pagerHTML = totalPages > 1 ? Array.from({length:totalPages},(_,i)=>i+1).map(p=>`<button class="${p===pageNum?'active':''}" onclick="goPage('${page}',${p})">${p}</button>`).join('') : '';
+
+  content.innerHTML = `
+    <div class="table-toolbar">
+      <input class="search-box" placeholder="Search ${cfg.title.toLowerCase()}…" value="${searchTerm}" oninput="searchTable('${page}',this.value)" />
+      <span style="color:var(--text3);font-size:12px;font-family:'DM Mono',monospace">${totalRows} rows</span>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr>${cfg.labels.map(l=>`<th>${l}</th>`).join('')}<th>Actions</th></tr></thead>
+        <tbody>
+          ${rows.rows.length === 0 ? `<tr><td colspan="${cfg.cols.length+1}"><div class="empty-state"><div class="icon">📭</div><p>No rows found</p></div></td></tr>` :
+          rows.rows.map(row => `<tr>
+            ${cfg.cols.map(col => `<td>${formatCell(col, row[col], cfg)}</td>`).join('')}
+            <td>
+              <button class="btn" style="padding:4px 10px;font-size:11px" onclick="openEditModal('${page}',${JSON.stringify(row).replace(/"/g,'&quot;')})">Edit</button>
+              ${cfg.pk ? `<button class="btn danger" style="padding:4px 10px;font-size:11px;margin-left:4px" onclick="deleteRow('${page}',${row[cfg.pk]})">Del</button>` : ''}
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <span>Showing ${offset+1}–${Math.min(offset+perPage,totalRows)} of ${totalRows} rows · table: ${cfg.table}</span>
+        <div class="pager">${pagerHTML}</div>
+      </div>
+    </div>
+  `;
+}
+
+window.goPage = (page, p) => { tablePages[page] = p; renderTable(page, window._searchTerm||''); };
+window.searchTable = (page, val) => { window._searchTerm = val; tablePages[page] = 1; renderTable(page, val); };
+
+function buildFormHTML(cfg, rowData={}) {
+  const half = [];
+  const full = [];
+  for (const f of cfg.form) {
+    const val = rowData[f.k] !== undefined ? rowData[f.k] : '';
+    const isTextarea = f.t === 'textarea';
+    const isCheckbox = f.t === 'checkbox';
+    let input;
+    if (isTextarea) input = `<textarea id="field-${f.k}" placeholder="${f.l}">${val}</textarea>`;
+    else if (isCheckbox) input = `<select id="field-${f.k}"><option value="true" ${val===true||val==='true'?'selected':''}>true</option><option value="false" ${!val||val===false||val==='false'?'selected':''}>false</option></select>`;
+    else input = `<input id="field-${f.k}" type="${f.t}" value="${val}" placeholder="${f.l}"/>`;
+    const group = `<div class="form-group${isTextarea?'  full':''}"><label>${f.l}</label>${input}</div>`;
+    if (isTextarea) full.push(group);
+    else half.push(group);
+  }
+  return `<div class="form-grid">${half.join('')}${full.join('')}</div>`;
+}
+
+function getFormValues(cfg) {
+  const vals = {};
+  for (const f of cfg.form) {
+    const el = document.getElementById('field-' + f.k);
+    if (!el) continue;
+    if (f.t === 'number') vals[f.k] = el.value === '' ? null : parseFloat(el.value);
+    else vals[f.k] = el.value === '' ? null : el.value;
+  }
+  return vals;
+}
+
+window.openAddModal = (page) => {
+  const cfg = tableConfig[page];
+  document.getElementById('modal-container').innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <h3>Add ${cfg.title.slice(0,-1)}</h3>
+        ${buildFormHTML(cfg)}
+        <div class="modal-footer">
+          <button class="btn" onclick="closeModal()">Cancel</button>
+          <button class="btn primary" onclick="submitAdd('${page}')">Add Row</button>
+        </div>
+      </div>
+    </div>`;
+};
+
+window.openEditModal = (page, row) => {
+  if (typeof row === 'string') row = JSON.parse(row);
+  const cfg = tableConfig[page];
+  document.getElementById('modal-container').innerHTML = `
+    <div class="modal-backdrop" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <h3>Edit ${cfg.title.slice(0,-1)}</h3>
+        ${buildFormHTML(cfg, row)}
+        <div class="modal-footer">
+          <button class="btn" onclick="closeModal()">Cancel</button>
+          <button class="btn primary" onclick="submitEdit('${page}',${row[cfg.pk]})">Save Changes</button>
+        </div>
+      </div>
+    </div>`;
+};
+
+window.closeModal = () => { document.getElementById('modal-container').innerHTML = ''; };
+
+window.submitAdd = async (page) => {
+  const cfg = tableConfig[page];
+  const vals = getFormValues(cfg);
+  const keys = Object.keys(vals).filter(k => vals[k] !== null && vals[k] !== '');
+  const placeholders = keys.map((_,i) => `$${i+1}`);
+  try {
+    await db.query(`INSERT INTO ${cfg.table} (${keys.join(',')}) VALUES (${placeholders.join(',')})`, keys.map(k=>vals[k]));
+    closeModal();
+    await updateBadges();
+    renderTable(page, window._searchTerm||'');
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+window.submitEdit = async (page, id) => {
+  const cfg = tableConfig[page];
+  const vals = getFormValues(cfg);
+  const keys = Object.keys(vals);
+  const sets = keys.map((k,i) => `${k}=$${i+1}`);
+  try {
+    await db.query(`UPDATE ${cfg.table} SET ${sets.join(',')} WHERE ${cfg.pk}=$${keys.length+1}`, [...keys.map(k=>vals[k]), id]);
+    closeModal();
+    renderTable(page, window._searchTerm||'');
+  } catch(e) { alert('Error: ' + e.message); }
+};
+
+window.deleteRow = async (page, id) => {
+  if (!confirm('Delete this row?')) return;
+  const cfg = tableConfig[page];
+  try {
+    await db.query(`DELETE FROM ${cfg.table} WHERE ${cfg.pk}=$1`, [id]);
+    await updateBadges();
+    renderTable(page, window._searchTerm||'');
+  } catch(e) { alert('Cannot delete — may be referenced by other records.\n' + e.message); }
+};
+
+const presetQueries = [
+  { label: 'Top students by submissions', sql: `SELECT s.name, COUNT(sub.submission_id) as submissions, AVG(sub.grade) as avg_grade\nFROM student s\nJOIN submission sub ON s.student_id = sub.student_id\nGROUP BY s.student_id, s.name\nORDER BY avg_grade DESC;` },
+  { label: 'Course revenue', sql: `SELECT c.title, COUNT(p.payment_id) as payments, SUM(p.amount) as revenue\nFROM course c\nJOIN payment p ON c.price = p.amount\nGROUP BY c.course_id, c.title\nORDER BY revenue DESC;` },
+  { label: 'Enrollment stats', sql: `SELECT c.title, COUNT(e.enrollment_id) as enrolled, \nCOUNT(CASE WHEN e.status='completed' THEN 1 END) as completed\nFROM course c\nLEFT JOIN enrollment e ON c.course_id = e.course_id\nGROUP BY c.course_id, c.title\nORDER BY enrolled DESC;` },
+  { label: 'Quiz leaderboard', sql: `SELECT s.name, AVG(qa.score) as avg_score, COUNT(qa.attempt_id) as attempts\nFROM student s\nJOIN quiz_attempt qa ON s.student_id = qa.student_id\nGROUP BY s.student_id, s.name\nORDER BY avg_score DESC;` },
+  { label: 'Course reviews summary', sql: `SELECT c.title, AVG(r.rating) as avg_rating, COUNT(r.review_id) as review_count\nFROM course c\nLEFT JOIN review r ON c.course_id = r.course_id\nGROUP BY c.course_id, c.title\nORDER BY avg_rating DESC;` },
+  { label: 'Students with certificates', sql: `SELECT s.name, c2.title as course, cert.issued_date\nFROM certificate cert\nJOIN enrollment e ON cert.enrollment_id = e.enrollment_id\nJOIN student s ON e.student_id = s.student_id\nJOIN course c2 ON e.course_id = c2.course_id\nORDER BY cert.issued_date DESC;` },
+];
+
+function renderSQL() {
+  const content = document.getElementById('content');
+  content.innerHTML = `
+    <div class="preset-queries">
+      ${presetQueries.map(q=>`<button class="preset-btn" onclick="loadPreset(${JSON.stringify(q.sql).replace(/"/g,'&quot;')})">${q.label}</button>`).join('')}
+    </div>
+    <div class="sql-editor">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;font-family:'DM Mono',monospace">SQL · PGlite (PostgreSQL)</div>
+      <textarea id="sql-input" spellcheck="false" placeholder="SELECT * FROM student LIMIT 10;">SELECT s.name, c.title, e.status, e.enrolled_at
+FROM enrollment e
+JOIN student s ON e.student_id = s.student_id
+JOIN course c ON e.course_id = c.course_id
+ORDER BY e.enrolled_at DESC
+LIMIT 20;</textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn primary" onclick="runSQL()">▶ Run Query</button>
+        <button class="btn" onclick="document.getElementById('sql-input').value=''">Clear</button>
+      </div>
+    </div>
+    <div id="sql-result"></div>
+  `;
+}
+
+window.loadPreset = (sql) => {
+  document.getElementById('sql-input').value = sql;
+};
+
+window.runSQL = async () => {
+  const sql = document.getElementById('sql-input').value.trim();
+  if (!sql) return;
+  const result = document.getElementById('sql-result');
+  result.innerHTML = '<div class="sql-result"><div class="sql-result-header"><span>Running…</span></div></div>';
+  try {
+    const r = await db.query(sql);
+    if (!r.rows || r.rows.length === 0) {
+      result.innerHTML = `<div class="sql-result"><div class="sql-result-header"><span style="color:var(--success)">✓ Query executed successfully · 0 rows returned</span></div><div class="sql-empty">No results</div></div>`;
+      return;
+    }
+    const cols = Object.keys(r.rows[0]);
+    result.innerHTML = `
+      <div class="sql-result">
+        <div class="sql-result-header">
+          <span style="color:var(--success)">✓ ${r.rows.length} rows returned</span>
+          <span>${cols.length} columns</span>
+        </div>
+        <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+          <tbody>${r.rows.map(row=>`<tr>${cols.map(c=>{
+            const v = row[c];
+            if (v === null) return `<td><span style="color:var(--text3);font-style:italic">null</span></td>`;
+            if (typeof v === 'boolean') return `<td><span class="tag ${v?'green':'gray'}">${v}</span></td>`;
+            const s = String(v);
+            return `<td>${s.length > 80 ? s.slice(0,80)+'…' : s}</td>`;
+          }).join('')}</tr>`).join('')}</tbody>
+        </table>
+        </div>
+      </div>`;
+  } catch(e) {
+    result.innerHTML = `<div class="sql-result"><div class="sql-result-header"><span style="color:var(--danger)">✗ Error</span></div><div class="sql-error">${e.message}</div></div>`;
+  }
+};
+
+// BOOT
+(async () => {
+  try {
+    await initDB();
+    await updateBadges();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('sidebar').style.display = 'flex';
+    document.getElementById('main-area').style.display = 'flex';
+    navigate('dashboard');
+  } catch(e) {
+    document.getElementById('progress-log').innerHTML += `<div style="color:var(--danger)">✗ Error: ${e.message}</div>`;
+  }
+})();
+
+window.navigate = navigate;
+</script>
+</body>
+</html>
